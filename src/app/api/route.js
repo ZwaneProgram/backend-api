@@ -1,4 +1,4 @@
-// app/api/route.js
+'use server'
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 import dotenv from 'dotenv';
