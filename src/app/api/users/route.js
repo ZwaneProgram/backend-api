@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 dotenv.config();
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
-});x
+});
 client.connect();
 
 const corsHeaders = {
