@@ -5,42 +5,47 @@ import bcrypt from 'bcrypt';
 dotenv.config();
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
-});
+});x
 client.connect();
+
+const corsHeaders = {
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PATCH,PUT,DELETE",
+  "Content-Type": "application/json"
+};
+
 export async function GET() {
   try {
     const result = await client.query('SELECT * FROM tbl_users');
     return new Response(JSON.stringify(result.rows), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: corsHeaders,
     });
   } catch (error) {
-
+    console.error(error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: corsHeaders,
     });
   }
 }
-
 
 //-------------------------------------------------------------------------------------
 export async function POST(request) {
   try {
     const { firstname, lastname, username, password } = await request.json();
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
     const res = await client.query('INSERT INTO tbl_users (firstname, lastname, username, password) VALUES ($1, $2, $3, $4) RETURNING *', [firstname, lastname, username, hashedPassword]);
     return new Response(JSON.stringify(res.rows[0]), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   } catch (error) {
     console.error(error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   }
 }
@@ -49,7 +54,6 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const { id, firstname, lastname, password } = await request.json();
-
     let query = 'UPDATE tbl_users SET firstname = $1, lastname = $2';
     const queryParams = [firstname, lastname];
 
@@ -67,19 +71,19 @@ export async function PUT(request) {
     if (res.rows.length === 0) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
-        headers: { 'Content-Type': 'application/json' },
+        headers: corsHeaders,
       });
     }
 
     return new Response(JSON.stringify(res.rows[0]), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   } catch (error) {
     console.error(error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   }
 }
@@ -92,19 +96,18 @@ export async function DELETE(request) {
     if (res.rows.length === 0) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
-        headers: { 'Content-Type': 'application/json' },
+        headers: corsHeaders,
       });
     }
     return new Response(JSON.stringify(res.rows[0]), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   } catch (error) {
     console.error(error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
     });
   }
 }
-//-------------------------------------------------------------------------------------
